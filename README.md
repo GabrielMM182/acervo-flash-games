@@ -58,6 +58,7 @@ tire da biblioteca (index.html), mande a pasta para a Lixeira e atualize este RE
 flash-local/
   index.html              Library page + Ruffle player (game/variant chosen by query string)
   server.mjs              Dependency-free static server, 127.0.0.1:8090 (PORT/HOST env override)
+  quarantine/             Temporary download directory (should be empty between game additions)
   tools/
     inspect-swf.mjs       Static check: header, stage, AVM1 vs AVM2, tag counts, URLs, network keywords
     disasm-swf.mjs        AVM1 disassembler (DoAction + DefineButton2 only) for diffs
@@ -95,6 +96,19 @@ To use the Claude desktop browser pane instead, add this entry to `C:\Users\inst
 }
 ```
 
+## Library interface
+
+The main page (`http://localhost:8090/`) displays a modern grid-based library inspired by emulator frontends like RetroArch and Launchbox. Each game is shown as a card with:
+
+- **Cover image**: Automatically loaded from Flashpoint Archive via `flashpointId` (screenshots or logos)
+- **Title**: Game name
+- **Metadata**: Developer, year, and genre
+- **Variant badges**: Clickable pills for each available version (original, cheats, unlocked)
+
+The interface is fully responsive and uses a dark theme optimized for browsing. Click any variant badge to launch the game in fullscreen mode with Ruffle. A "Back to Library" button returns you to the game grid.
+
+**Cover images**: Fetched on-demand from `https://infinity.unstable.life/Infinity/images/Screenshots/{flashpointId}.png`. If unavailable, a 🎮 placeholder is shown. No manual image management needed.
+
 ## Network isolation
 
 Two layers, both in `index.html`:
@@ -108,6 +122,22 @@ Ruffle is loaded from `https://unpkg.com/@ruffle-rs/ruffle@0.6.0/ruffle.js` (pin
 
 A SWF is not a Windows executable. Historical Flash malware exploited memory-corruption bugs in Adobe Flash Player itself. Ruffle is a separate implementation written in Rust, compiled to WebAssembly, and runs inside the browser sandbox with no file-system access. The remaining risk is the game reaching the network (old ad/score servers whose domains may now belong to someone else), which the CSP blocks. Never run the SWF with Flashpoint's bundled `flashplayer_32_sa.exe` (old Adobe projector).
 
+## Download sources
+
+**Flashpoint data packs** (preferred):
+- URL pattern: `https://download.unstable.life/gib-roms/Games/<id>-<timestamp>.zip`
+- Contains multiple versions (Armor Games, Kongregate, Newgrounds, etc.) in one package
+- May be unavailable or return 404 for some games
+- Service availability can be intermittent
+
+**Internet Archive** (fallback):
+- URL: `https://archive.org` (search by game title or SWF filename)
+- Trusted non-profit digital library, safe source
+- Games preserved by individual uploaders, so availability varies
+- Direct SWF downloads (no ZIP extraction needed)
+
+Both sources are safe. The quarantine folder and static check provide an additional validation layer before integrating games into the archive.
+
 ## Adding a new game
 
 1. **Locate it on Flashpoint Archive.**
@@ -117,21 +147,46 @@ A SWF is not a Windows executable. Historical Flash malware exploited memory-cor
      Use `id=<id>` to read one entry, or `originalDescription=<word>` to search by what the game was about, then filter locally.
    - Portuguese portals such as Click Jogos often renamed games; search by mechanics/description, not by the remembered Portuguese title.
    - Entry page: `https://flashpointarchive.org/view?id=<id>` shows status, launch command (SWF name), size and screenshot.
-2. **Find the data pack.** The 9o3o page `https://ooooooooo.ooo/?id=<id>` contains the URL `https://download.unstable.life/gib-roms/Games/<id>-<timestamp>.zip`. Use `curl -sI` to read its size and tell the user name, source and size before downloading.
-3. **Download into an isolated empty folder**, run `unzip -l` and check that no entry contains `..` or an absolute path, then extract.
-   - Packs often hold several copies of the game (Armor Games, Kongregate, Newgrounds, foreign portals, "prehacked" versions from arcadeprehacks). Use the file matching the entry's launch command (normally the original publisher's). Do not use third-party prehacked files; cheats are made here, documented and reversible.
+2. **Find the download source (priority order):**
+   - **First, try Flashpoint data pack:** The 9o3o page `https://ooooooooo.ooo/?id=<id>` may contain the URL `https://download.unstable.life/gib-roms/Games/<id>-<timestamp>.zip`. Use `curl -sI` to check availability and read size before downloading. This is the preferred source as it often includes multiple versions (Armor Games, Kongregate, Newgrounds) in one package.
+   - **If Flashpoint pack is unavailable, try Archive.org:** Search for the game title or SWF filename at `https://archive.org`. The Internet Archive is a trusted non-profit digital library and a safe alternative source. Many Flash games have been preserved there by individual uploaders.
+   - **Last resort:** Check if the original host URL (from launch command) still works, but be aware most historical game portals are offline.
+3. **Download into quarantine folder**:
+   - **For ZIP packs:** Download to `quarantine/`, run `unzip -l` and check that no entry contains `..` or an absolute path, then extract.
+     - Packs often hold several copies of the game (Armor Games, Kongregate, Newgrounds, foreign portals, "prehacked" versions from arcadeprehacks). Use the file matching the entry's launch command (normally the original publisher's). Do not use third-party prehacked files; cheats are made here, documented and reversible.
+   - **For direct SWF files:** Download to `quarantine/<game-name>.swf` and proceed to static check.
 4. **Static check** (run from a different directory than the download):
    ```bash
    node C:/Users/insti/flash-local/tools/inspect-swf.mjs "<path-to-swf>"
    ```
    Look at: signature (`FWS`/`CWS` fine, `ZWS` = LZMA not supported by the tools), SWF version, `avm` (AVM1 = AS1/AS2, AVM2 = AS3; the header version alone does not tell, e.g. Weapon is v9 but AS2), `urlLikeStrings` and `keywordHits` (`loadMovie` usually means ads; `services.armorgames.com`, Kongregate, Newgrounds mean portal APIs). Expected noise: publisher/developer links, `_blank`, `SharedObject`, XMP metadata URLs, font credits.
 5. **Copy** the SWF to `games/<id>/<id>.swf` and register it in the `GAMES` object in `index.html` (title, stage width/height from the check, variants; the first variant is the default).
+   - Open `index.html` and locate the `GAMES` object in the `<script>` section
+   - Add a new entry following this template:
+   ```javascript
+   "<game-id>": {
+     title: "Game Title",
+     developer: "Developer / Publisher",
+     year: "YYYY",
+     genre: "Genre Category",
+     flashpointId: "<flashpoint-uuid>",  // From the entry page URL
+     width: 800,   // From inspect-swf.mjs output
+     height: 600,  // From inspect-swf.mjs output
+     variants: {
+       original: "games/<game-id>/<game-id>.swf",
+     },
+   },
+   ```
+   - The `flashpointId` enables automatic cover images from Flashpoint Archive
+   - Screenshots load from: `https://infinity.unstable.life/Infinity/images/Screenshots/{flashpointId}.png`
+   - If the image doesn't exist, a placeholder 🎮 is shown automatically
 6. **Export the scripts** for reading:
    ```bash
    java -jar C:/Users/insti/tools/ffdec_26.3.0/ffdec-cli.jar -format script:as -export script C:/Users/insti/flash-local/games/<id>/source C:/Users/insti/flash-local/games/<id>/<id>.swf
    ```
 7. **Test** in the browser: page loads, Ruffle console has no errors, the game's own preloader reaches 100%, the menu appears. Large games can take 30-60 s in the preloader under Ruffle; some intros stop and wait for a click on a specific button.
-8. **Update this README** (archive table, hashes, notes).
+8. **Clean quarantine** after successful installation: `rm quarantine/*` (the directory should be empty between game additions).
+9. **Update this README** (archive table, hashes, notes).
 
 ### Sitelocks
 
@@ -141,6 +196,51 @@ Many portal games check where they were loaded from. Typical AS2 pattern: take `
 - In the bytecode the guard ends with `Push "<domain>", Equals2, Not, Not, If +N` (the `&&` short-circuit lands on the second `Not`), followed by the lock block.
 - Swap the final `Not, If` to `Pop, Jump` (same offset): both paths discard the condition and always skip the lock block. 2 bytes.
 - `games/last-stand-2/fixes/patch-sitelock.mjs` is the template (uses `findSequences` from `tools/avm1.mjs`).
+
+### Example: Adding a new game end-to-end
+
+**Scenario**: Adding "Bloons Tower Defense" from Flashpoint.
+
+1. **Find on Flashpoint**: Visit `https://flashpointarchive.org/search` and search for "Bloons Tower Defense". Open the entry page: `https://flashpointarchive.org/view?id=abc123...`
+   - Note the **ID** from the URL: `abc123-def4-5678-90ab-cdef12345678`
+   - Note the **launch command**: `http://localflash/btd.swf`
+   - Note the **size**: 2.1 MB
+
+2. **Download**: Try Flashpoint ZIP first via `https://ooooooooo.ooo/?id=abc123...`. If unavailable, search `archive.org` for "Bloons Tower Defense swf".
+
+3. **Static check**:
+   ```bash
+   node tools/inspect-swf.mjs quarantine/btd.swf
+   ```
+   Output shows: `width: 640, height: 480, avm: AVM1 (AS2)`
+
+4. **Copy and export**:
+   ```bash
+   cp quarantine/btd.swf games/btd/btd.swf
+   java -jar ~/tools/ffdec_26.3.0/ffdec-cli.jar -format script:as -export script games/btd/source games/btd/btd.swf
+   ```
+
+5. **Register in `index.html`**: Open the file, find the `GAMES` object, and add:
+   ```javascript
+   "btd": {
+     title: "Bloons Tower Defense",
+     developer: "Ninja Kiwi",
+     year: "2007",
+     genre: "Tower Defense",
+     flashpointId: "abc123-def4-5678-90ab-cdef12345678",
+     width: 640,
+     height: 480,
+     variants: {
+       original: "games/btd/btd.swf",
+     },
+   },
+   ```
+
+6. **Test**: Open `http://localhost:8090/`, see the new card with cover image, click `original` to play.
+
+7. **Clean up**: `rm quarantine/*`
+
+8. **Update README**: Add to the archive table and hash list.
 
 ## Building cheats
 
