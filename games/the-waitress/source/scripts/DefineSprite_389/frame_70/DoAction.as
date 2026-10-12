@@ -1,0 +1,1 @@
+Cup.gotoAndStop(CupN);

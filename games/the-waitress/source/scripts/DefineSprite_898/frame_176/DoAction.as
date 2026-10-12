@@ -1,0 +1,1 @@
+Tray.gotoAndStop(4);

@@ -185,8 +185,9 @@ Stack reasoning for `Subtract -> Pop`: before it the stack holds `[object, "name
 |---|---|---|---|---|
 | Resident Evil: Apocalypse (2004 promotional game, HypeGames) | `638dff57-94a2-477d-a454-d50895a07a18` | v6, AS1, 605 KB | 700x570 @ 30 fps | `original`, `godmode` |
 | Weapon (Simon Hason / Armor Games, 2009) | `252cc09b-2701-49f0-ab8e-9210c1995c93` | v9 header but AS2, 3.8 MB | 760x380 @ 28 fps | `original`, `heli`, `money`, `all` |
+| The Waitress (D-Man / GamingDelight, 2007) | `19e16dc4-af08-46b5-a06f-b6f875fedab6` | v6, AS1, 973 KB | 620x340 @ 12 fps | `original` |
 | The Last Stand (Con Artists / Armor Games, 2007) | `26174ca1-7ad9-4daf-a9a3-34bf48e77f27` | v8, AS2, 4.5 MB | 800x420 @ 35 fps | `original` |
-| The Last Stand 2 (Con Artists / Armor Games, 2008) | `b37ed848-c774-4cd0-8ed4-a374b31da4a0` | v8, AS2, 8.8 MB | 800x420 @ 35 fps | `unlocked` (default), `original` |
+| The Last Stand 2 (Con Artists / Armor Games, 2008) | `b37ed848-c774-4cd0-8ed4-a374b31da4a0` | v8, AS2, 8.8 MB | 800x420 @ 35 fps | `barricade-god` (default), `unlocked`, `original` |
 
 Data pack SHA-256 at download time:
 
@@ -194,6 +195,7 @@ Data pack SHA-256 at download time:
 - Weapon zip `e1f999576e45575ac45a1e198cb19a44c86e211fd2fabd3705a0783919d489de`
 - The Last Stand zip `5f774611459c9620bd6f0c750509d886322df0d870f22f1578f1c146d1069f00`
 - The Last Stand 2 zip `fd1ee38dbef0194dd2827e1943d5814c781d19b9600d1d8bda4b38abbb32cb03`
+- The Waitress swf (Internet Archive) `c84ea775608b11c88c4217ea83eab03def5d240be22a8c58a4278c851c7c2af6`
 - FFDec `ffdec_26.3.0.zip` `35f4930eb7c380afe66f2117f90b006deac0631473ad7500bb39c78f68645ecd`
 
 ### Resident Evil: Apocalypse
@@ -226,7 +228,20 @@ Data pack SHA-256 at download time:
   ```bash
   node C:/Users/insti/flash-local/games/last-stand-2/fixes/patch-sitelock.mjs C:/Users/insti/flash-local/games/last-stand-2/last-stand-2.swf C:/Users/insti/flash-local/games/last-stand-2/last-stand-2-unlocked.swf
   ```
-- The preloader tries to load a CPMStar ad via `loadMovie` (blocked by the CSP). Preloading takes about 40 s under Ruffle before PLAY appears. No cheats yet.
+- The preloader tries to load a CPMStar ad via `loadMovie` (blocked by the CSP). Preloading takes about 40 s under Ruffle before PLAY appears.
+- `wall.health` is the barricade health. Damage happens at 2 sites in frame 7 (one for armed zombies at 1.5x damage, one for regular zombies). Game over occurs when `wall.health <= -1`.
+- `barricade-god`: 2 `Subtract -> Pop` swaps. Barricade takes no damage.
+- Regenerate:
+  ```bash
+  node C:/Users/insti/flash-local/games/last-stand-2/cheats/patch-barricade.mjs C:/Users/insti/flash-local/games/last-stand-2/last-stand-2-unlocked.swf C:/Users/insti/flash-local/games/last-stand-2/last-stand-2-barricade-god.swf
+  ```
+
+### The Waitress
+
+- Source: Internet Archive (`https://archive.org/download/flash_thewaitress/thewaitress.swf`). The original Flashpoint data pack was not found; the SWF was downloaded directly.
+- Time management game: take orders, serve food/drinks, clean tables. Four frame labels: `MainMenu`, `Init`, `Game`, `GameOver`.
+- Network calls: attempts to load MochiAds and send high scores to `sugar-free-games.com` (both blocked by CSP). The ad preloader likely skips quickly under Ruffle since the `loadMovie` target is unreachable.
+- Runs unmodified. No cheats yet.
 
 ### Removed / not working
 
