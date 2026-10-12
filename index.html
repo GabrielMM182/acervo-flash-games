@@ -2,59 +2,243 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://unpkg.com; connect-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://unpkg.com; connect-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://infinity.unstable.life; media-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Local Flash Player</title>
   <style>
     :root {
       --bg: #0d0d0f;
-      --fg: #c9c9cf;
+      --bg-card: #1a1a1f;
+      --bg-hover: #242429;
+      --fg: #e5e5e9;
+      --fg-dim: #9898a0;
       --muted: #6b6b75;
       --accent: #e0a040;
+      --accent-dim: #b8823a;
+      --border: #2a2a32;
+    }
+    * {
+      box-sizing: border-box;
     }
     html, body {
       margin: 0;
+      padding: 0;
       min-height: 100%;
       background: var(--bg);
       color: var(--fg);
-      font: 14px/1.4 system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
     }
     body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
       min-height: 100vh;
-      padding: 0 16px;
-      box-sizing: border-box;
+      padding: 20px;
     }
-    #stage ruffle-player {
-      width: 100%;
-      height: 100%;
+    
+    /* Header */
+    header {
+      max-width: 1400px;
+      margin: 0 auto 32px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
     }
-    #library ul {
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--fg);
+    }
+    .subtitle {
+      color: var(--fg-dim);
+      font-size: 14px;
+    }
+    
+    /* Library Grid */
+    #library {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    #library-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
       list-style: none;
       padding: 0;
       margin: 0;
-      display: grid;
-      gap: 12px;
     }
-    #library li span {
-      display: block;
+    
+    /* Game Card */
+    .game-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .game-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-dim);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Cover Image */
+    .game-cover {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(135deg, #1a1a1f 0%, #2a2a32 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .game-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .game-cover-placeholder {
+      width: 60%;
+      height: 60%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      opacity: 0.3;
+    }
+    
+    /* Card Content */
+    .game-info {
+      padding: 16px;
+    }
+    .game-title {
       font-size: 16px;
-      margin-bottom: 4px;
+      font-weight: 600;
+      margin: 0 0 8px;
+      color: var(--fg);
+      line-height: 1.3;
     }
-    #library a {
-      color: var(--accent);
-      margin-right: 12px;
-    }
-    footer {
-      color: var(--muted);
+    .game-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
       font-size: 12px;
+      color: var(--fg-dim);
+    }
+    .game-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .game-meta-item::before {
+      content: "•";
+      color: var(--muted);
+    }
+    .game-meta-item:first-child::before {
+      content: none;
+    }
+    
+    /* Variants */
+    .game-variants {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .variant-link {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(224, 160, 64, 0.1);
+      color: var(--accent);
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid rgba(224, 160, 64, 0.2);
+      transition: all 0.2s;
+    }
+    .variant-link:hover {
+      background: rgba(224, 160, 64, 0.2);
+      border-color: var(--accent);
+      transform: scale(1.05);
+    }
+    .variant-link.default {
+      background: rgba(224, 160, 64, 0.15);
+      border-color: var(--accent-dim);
+    }
+    
+    /* Stage (Game Player) */
+    #stage {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    #stage-header {
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    #back-button {
+      padding: 8px 16px;
+      background: var(--bg);
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    #back-button:hover {
+      background: var(--bg-hover);
+      border-color: var(--accent-dim);
+    }
+    #stage-info {
+      flex: 1;
+      font-size: 14px;
+      color: var(--fg-dim);
+    }
+    #stage-game {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #stage-game ruffle-player {
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Footer */
+    footer {
+      max-width: 1400px;
+      margin: 48px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
     }
     footer a {
-      color: var(--muted);
+      color: var(--accent-dim);
+      text-decoration: none;
+    }
+    footer a:hover {
+      color: var(--accent);
+    }
+    
+    /* Visibility helpers */
+    [hidden] {
+      display: none !important;
     }
   </style>
   <script>
@@ -71,15 +255,35 @@
   <script src="https://unpkg.com/@ruffle-rs/ruffle@0.6.0/ruffle.js"></script>
 </head>
 <body>
+  <header id="library-header" hidden>
+    <h1>🎮 Flash Games Archive</h1>
+    <p class="subtitle">Personal collection • Local playback via Ruffle • Network isolated</p>
+  </header>
+  
   <nav id="library" hidden>
-    <ul></ul>
+    <ul id="library-grid"></ul>
   </nav>
-  <div id="stage" hidden></div>
-  <footer id="status"></footer>
+  
+  <div id="stage" hidden>
+    <div id="stage-header">
+      <a href="./" id="back-button">← Back to Library</a>
+      <span id="stage-info"></span>
+    </div>
+    <div id="stage-game"></div>
+  </div>
+  
+  <footer id="footer" hidden>
+    <p>All games preserved for personal use • Not for redistribution • <a href="https://ruffle.rs" target="_blank" rel="noopener">Powered by Ruffle 0.6.0</a></p>
+  </footer>
+  
   <script>
     const GAMES = {
       "re-apocalypse": {
         title: "Resident Evil: Apocalypse",
+        developer: "HypeGames",
+        year: "2004",
+        genre: "Top-Down Shooter",
+        flashpointId: "638dff57-94a2-477d-a454-d50895a07a18",
         width: 700,
         height: 570,
         variants: {
@@ -89,6 +293,10 @@
       },
       weapon: {
         title: "Weapon",
+        developer: "Simon Hason / Armor Games",
+        year: "2009",
+        genre: "Defense / Strategy",
+        flashpointId: "252cc09b-2701-49f0-ab8e-9210c1995c93",
         width: 760,
         height: 380,
         variants: {
@@ -100,6 +308,10 @@
       },
       "last-stand": {
         title: "The Last Stand",
+        developer: "Con Artists / Armor Games",
+        year: "2007",
+        genre: "Survival / Defense",
+        flashpointId: "26174ca1-7ad9-4daf-a9a3-34bf48e77f27",
         width: 800,
         height: 420,
         variants: {
@@ -108,6 +320,10 @@
       },
       "last-stand-2": {
         title: "The Last Stand 2",
+        developer: "Con Artists / Armor Games",
+        year: "2008",
+        genre: "Survival / Defense",
+        flashpointId: "b37ed848-c774-4cd0-8ed4-a374b31da4a0",
         width: 800,
         height: 420,
         variants: {
@@ -118,6 +334,10 @@
       },
       "the-waitress": {
         title: "The Waitress",
+        developer: "D-Man",
+        year: "2007",
+        genre: "Time Management",
+        flashpointId: "19e16dc4-af08-46b5-a06f-b6f875fedab6",
         width: 620,
         height: 340,
         variants: {
@@ -127,46 +347,107 @@
     };
 
     const params = new URLSearchParams(location.search);
-    const game = GAMES[params.get("game")];
+    const gameId = params.get("game");
+    const game = GAMES[gameId];
 
     const renderLibrary = () => {
-      const list = document.querySelector("#library ul");
-      Object.entries(GAMES).forEach(([id, { title, variants }]) => {
-        const item = document.createElement("li");
-        const name = document.createElement("span");
-        name.textContent = title;
-        item.appendChild(name);
-        Object.keys(variants).forEach((variant) => {
-          const link = document.createElement("a");
-          link.href = `?game=${id}&variant=${variant}`;
-          link.textContent = variant;
-          item.appendChild(link);
-        });
-        list.appendChild(item);
+      console.log("Rendering library with", Object.keys(GAMES).length, "games");
+      const grid = document.getElementById("library-grid");
+      
+      if (!grid) {
+        console.error("library-grid element not found!");
+        return;
+      }
+      
+      Object.entries(GAMES).forEach(([id, gameData]) => {
+        const card = document.createElement("li");
+        card.className = "game-card";
+        
+        const variantKeys = Object.keys(gameData.variants);
+        const defaultVariant = variantKeys[0];
+        
+        // URLs de imagem do Flashpoint
+        const screenshotUrl = `https://infinity.unstable.life/Infinity/images/Screenshots/${gameData.flashpointId}.png`;
+        const logoUrl = `https://infinity.unstable.life/Infinity/images/Logos/${gameData.flashpointId}.png`;
+        
+        card.innerHTML = `
+          <div class="game-cover">
+            <img src="${screenshotUrl}" alt="${gameData.title}" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="game-cover-placeholder" style="display:none;">🎮</div>
+          </div>
+          <div class="game-info">
+            <h3 class="game-title">${gameData.title}</h3>
+            <div class="game-meta">
+              <span class="game-meta-item">${gameData.developer}</span>
+              <span class="game-meta-item">${gameData.year}</span>
+              <span class="game-meta-item">${gameData.genre}</span>
+            </div>
+            <div class="game-variants">
+              ${variantKeys.map((variant, idx) => 
+                `<a href="?game=${id}&variant=${variant}" class="variant-link ${idx === 0 ? 'default' : ''}">${variant}</a>`
+              ).join('')}
+            </div>
+          </div>
+        `;
+        
+        grid.appendChild(card);
       });
-      document.getElementById("library").hidden = false;
+      
+      console.log("Library rendered:", grid.children.length, "cards");
+      
+      const header = document.getElementById("library-header");
+      const library = document.getElementById("library");
+      const footer = document.getElementById("footer");
+      
+      console.log("Before unhiding - header:", header.hidden, "library:", library.hidden, "footer:", footer.hidden);
+      
+      header.hidden = false;
+      library.hidden = false;
+      footer.hidden = false;
+      
+      console.log("After unhiding - header:", header.hidden, "library:", library.hidden, "footer:", footer.hidden);
     };
 
     const renderGame = () => {
+      console.log("Rendering game:", gameId, game);
+      if (!game) {
+        console.error("Game not found:", gameId);
+        window.location.href = "./";
+        return;
+      }
+      
       const defaultSwf = Object.values(game.variants)[0];
-      const swfUrl = game.variants[params.get("variant")] ?? defaultSwf;
+      const variantName = params.get("variant") || Object.keys(game.variants)[0];
+      const swfUrl = game.variants[variantName] ?? defaultSwf;
+      
       const stage = document.getElementById("stage");
-      stage.style.width = `min(${game.width}px, 100%)`;
-      stage.style.aspectRatio = `${game.width} / ${game.height}`;
-      stage.hidden = false;
-
+      const stageGame = document.getElementById("stage-game");
+      const stageInfo = document.getElementById("stage-info");
+      
+      stageGame.style.maxWidth = `${game.width}px`;
+      stageGame.style.aspectRatio = `${game.width} / ${game.height}`;
+      
+      stageInfo.textContent = `${game.title} • ${variantName} • ${game.width}×${game.height} • Network isolated`;
+      
       const player = window.RufflePlayer.newest().createPlayer();
-      stage.appendChild(player);
+      stageGame.appendChild(player);
       player.ruffle().load({ url: swfUrl });
-
-      const status = document.getElementById("status");
-      const back = document.createElement("a");
-      back.href = "./";
-      back.textContent = "library";
-      status.append(back, ` - ${swfUrl} - networking disabled`);
+      
+      stage.hidden = false;
+      document.getElementById("library-header").hidden = true;
+      document.getElementById("library").hidden = true;
+      document.getElementById("footer").hidden = true;
     };
 
-    window.addEventListener("load", () => (game ? renderGame() : renderLibrary()));
+    window.addEventListener("load", () => {
+      console.log("Page loaded. Game param:", gameId);
+      if (game) {
+        renderGame();
+      } else {
+        renderLibrary();
+      }
+    });
   </script>
 </body>
 </html>

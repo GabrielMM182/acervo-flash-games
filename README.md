@@ -58,6 +58,7 @@ tire da biblioteca (index.html), mande a pasta para a Lixeira e atualize este RE
 flash-local/
   index.html              Library page + Ruffle player (game/variant chosen by query string)
   server.mjs              Dependency-free static server, 127.0.0.1:8090 (PORT/HOST env override)
+  quarantine/             Temporary download directory (should be empty between game additions)
   tools/
     inspect-swf.mjs       Static check: header, stage, AVM1 vs AVM2, tag counts, URLs, network keywords
     disasm-swf.mjs        AVM1 disassembler (DoAction + DefineButton2 only) for diffs
@@ -108,6 +109,22 @@ Ruffle is loaded from `https://unpkg.com/@ruffle-rs/ruffle@0.6.0/ruffle.js` (pin
 
 A SWF is not a Windows executable. Historical Flash malware exploited memory-corruption bugs in Adobe Flash Player itself. Ruffle is a separate implementation written in Rust, compiled to WebAssembly, and runs inside the browser sandbox with no file-system access. The remaining risk is the game reaching the network (old ad/score servers whose domains may now belong to someone else), which the CSP blocks. Never run the SWF with Flashpoint's bundled `flashplayer_32_sa.exe` (old Adobe projector).
 
+## Download sources
+
+**Flashpoint data packs** (preferred):
+- URL pattern: `https://download.unstable.life/gib-roms/Games/<id>-<timestamp>.zip`
+- Contains multiple versions (Armor Games, Kongregate, Newgrounds, etc.) in one package
+- May be unavailable or return 404 for some games
+- Service availability can be intermittent
+
+**Internet Archive** (fallback):
+- URL: `https://archive.org` (search by game title or SWF filename)
+- Trusted non-profit digital library, safe source
+- Games preserved by individual uploaders, so availability varies
+- Direct SWF downloads (no ZIP extraction needed)
+
+Both sources are safe. The quarantine folder and static check provide an additional validation layer before integrating games into the archive.
+
 ## Adding a new game
 
 1. **Locate it on Flashpoint Archive.**
@@ -117,9 +134,14 @@ A SWF is not a Windows executable. Historical Flash malware exploited memory-cor
      Use `id=<id>` to read one entry, or `originalDescription=<word>` to search by what the game was about, then filter locally.
    - Portuguese portals such as Click Jogos often renamed games; search by mechanics/description, not by the remembered Portuguese title.
    - Entry page: `https://flashpointarchive.org/view?id=<id>` shows status, launch command (SWF name), size and screenshot.
-2. **Find the data pack.** The 9o3o page `https://ooooooooo.ooo/?id=<id>` contains the URL `https://download.unstable.life/gib-roms/Games/<id>-<timestamp>.zip`. Use `curl -sI` to read its size and tell the user name, source and size before downloading.
-3. **Download into an isolated empty folder**, run `unzip -l` and check that no entry contains `..` or an absolute path, then extract.
-   - Packs often hold several copies of the game (Armor Games, Kongregate, Newgrounds, foreign portals, "prehacked" versions from arcadeprehacks). Use the file matching the entry's launch command (normally the original publisher's). Do not use third-party prehacked files; cheats are made here, documented and reversible.
+2. **Find the download source (priority order):**
+   - **First, try Flashpoint data pack:** The 9o3o page `https://ooooooooo.ooo/?id=<id>` may contain the URL `https://download.unstable.life/gib-roms/Games/<id>-<timestamp>.zip`. Use `curl -sI` to check availability and read size before downloading. This is the preferred source as it often includes multiple versions (Armor Games, Kongregate, Newgrounds) in one package.
+   - **If Flashpoint pack is unavailable, try Archive.org:** Search for the game title or SWF filename at `https://archive.org`. The Internet Archive is a trusted non-profit digital library and a safe alternative source. Many Flash games have been preserved there by individual uploaders.
+   - **Last resort:** Check if the original host URL (from launch command) still works, but be aware most historical game portals are offline.
+3. **Download into quarantine folder**:
+   - **For ZIP packs:** Download to `quarantine/`, run `unzip -l` and check that no entry contains `..` or an absolute path, then extract.
+     - Packs often hold several copies of the game (Armor Games, Kongregate, Newgrounds, foreign portals, "prehacked" versions from arcadeprehacks). Use the file matching the entry's launch command (normally the original publisher's). Do not use third-party prehacked files; cheats are made here, documented and reversible.
+   - **For direct SWF files:** Download to `quarantine/<game-name>.swf` and proceed to static check.
 4. **Static check** (run from a different directory than the download):
    ```bash
    node C:/Users/insti/flash-local/tools/inspect-swf.mjs "<path-to-swf>"
@@ -131,7 +153,8 @@ A SWF is not a Windows executable. Historical Flash malware exploited memory-cor
    java -jar C:/Users/insti/tools/ffdec_26.3.0/ffdec-cli.jar -format script:as -export script C:/Users/insti/flash-local/games/<id>/source C:/Users/insti/flash-local/games/<id>/<id>.swf
    ```
 7. **Test** in the browser: page loads, Ruffle console has no errors, the game's own preloader reaches 100%, the menu appears. Large games can take 30-60 s in the preloader under Ruffle; some intros stop and wait for a click on a specific button.
-8. **Update this README** (archive table, hashes, notes).
+8. **Clean quarantine** after successful installation: `rm quarantine/*` (the directory should be empty between game additions).
+9. **Update this README** (archive table, hashes, notes).
 
 ### Sitelocks
 

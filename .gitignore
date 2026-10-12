@@ -1,2 +1,4 @@
 # games/**/*.swf
 # games/**/source/
+# Temporary download directory
+quarantine/
