@@ -96,6 +96,19 @@ To use the Claude desktop browser pane instead, add this entry to `C:\Users\inst
 }
 ```
 
+## Library interface
+
+The main page (`http://localhost:8090/`) displays a modern grid-based library inspired by emulator frontends like RetroArch and Launchbox. Each game is shown as a card with:
+
+- **Cover image**: Automatically loaded from Flashpoint Archive via `flashpointId` (screenshots or logos)
+- **Title**: Game name
+- **Metadata**: Developer, year, and genre
+- **Variant badges**: Clickable pills for each available version (original, cheats, unlocked)
+
+The interface is fully responsive and uses a dark theme optimized for browsing. Click any variant badge to launch the game in fullscreen mode with Ruffle. A "Back to Library" button returns you to the game grid.
+
+**Cover images**: Fetched on-demand from `https://infinity.unstable.life/Infinity/images/Screenshots/{flashpointId}.png`. If unavailable, a 🎮 placeholder is shown. No manual image management needed.
+
 ## Network isolation
 
 Two layers, both in `index.html`:
@@ -148,6 +161,25 @@ Both sources are safe. The quarantine folder and static check provide an additio
    ```
    Look at: signature (`FWS`/`CWS` fine, `ZWS` = LZMA not supported by the tools), SWF version, `avm` (AVM1 = AS1/AS2, AVM2 = AS3; the header version alone does not tell, e.g. Weapon is v9 but AS2), `urlLikeStrings` and `keywordHits` (`loadMovie` usually means ads; `services.armorgames.com`, Kongregate, Newgrounds mean portal APIs). Expected noise: publisher/developer links, `_blank`, `SharedObject`, XMP metadata URLs, font credits.
 5. **Copy** the SWF to `games/<id>/<id>.swf` and register it in the `GAMES` object in `index.html` (title, stage width/height from the check, variants; the first variant is the default).
+   - Open `index.html` and locate the `GAMES` object in the `<script>` section
+   - Add a new entry following this template:
+   ```javascript
+   "<game-id>": {
+     title: "Game Title",
+     developer: "Developer / Publisher",
+     year: "YYYY",
+     genre: "Genre Category",
+     flashpointId: "<flashpoint-uuid>",  // From the entry page URL
+     width: 800,   // From inspect-swf.mjs output
+     height: 600,  // From inspect-swf.mjs output
+     variants: {
+       original: "games/<game-id>/<game-id>.swf",
+     },
+   },
+   ```
+   - The `flashpointId` enables automatic cover images from Flashpoint Archive
+   - Screenshots load from: `https://infinity.unstable.life/Infinity/images/Screenshots/{flashpointId}.png`
+   - If the image doesn't exist, a placeholder 🎮 is shown automatically
 6. **Export the scripts** for reading:
    ```bash
    java -jar C:/Users/insti/tools/ffdec_26.3.0/ffdec-cli.jar -format script:as -export script C:/Users/insti/flash-local/games/<id>/source C:/Users/insti/flash-local/games/<id>/<id>.swf
@@ -164,6 +196,51 @@ Many portal games check where they were loaded from. Typical AS2 pattern: take `
 - In the bytecode the guard ends with `Push "<domain>", Equals2, Not, Not, If +N` (the `&&` short-circuit lands on the second `Not`), followed by the lock block.
 - Swap the final `Not, If` to `Pop, Jump` (same offset): both paths discard the condition and always skip the lock block. 2 bytes.
 - `games/last-stand-2/fixes/patch-sitelock.mjs` is the template (uses `findSequences` from `tools/avm1.mjs`).
+
+### Example: Adding a new game end-to-end
+
+**Scenario**: Adding "Bloons Tower Defense" from Flashpoint.
+
+1. **Find on Flashpoint**: Visit `https://flashpointarchive.org/search` and search for "Bloons Tower Defense". Open the entry page: `https://flashpointarchive.org/view?id=abc123...`
+   - Note the **ID** from the URL: `abc123-def4-5678-90ab-cdef12345678`
+   - Note the **launch command**: `http://localflash/btd.swf`
+   - Note the **size**: 2.1 MB
+
+2. **Download**: Try Flashpoint ZIP first via `https://ooooooooo.ooo/?id=abc123...`. If unavailable, search `archive.org` for "Bloons Tower Defense swf".
+
+3. **Static check**:
+   ```bash
+   node tools/inspect-swf.mjs quarantine/btd.swf
+   ```
+   Output shows: `width: 640, height: 480, avm: AVM1 (AS2)`
+
+4. **Copy and export**:
+   ```bash
+   cp quarantine/btd.swf games/btd/btd.swf
+   java -jar ~/tools/ffdec_26.3.0/ffdec-cli.jar -format script:as -export script games/btd/source games/btd/btd.swf
+   ```
+
+5. **Register in `index.html`**: Open the file, find the `GAMES` object, and add:
+   ```javascript
+   "btd": {
+     title: "Bloons Tower Defense",
+     developer: "Ninja Kiwi",
+     year: "2007",
+     genre: "Tower Defense",
+     flashpointId: "abc123-def4-5678-90ab-cdef12345678",
+     width: 640,
+     height: 480,
+     variants: {
+       original: "games/btd/btd.swf",
+     },
+   },
+   ```
+
+6. **Test**: Open `http://localhost:8090/`, see the new card with cover image, click `original` to play.
+
+7. **Clean up**: `rm quarantine/*`
+
+8. **Update README**: Add to the archive table and hash list.
 
 ## Building cheats
 
