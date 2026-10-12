@@ -1,0 +1,12 @@
+_root.mag--;
+_root.shots++;
+_root.pistolshellcall();
+_root.shooting();
+_root.gun.gunsel._rotation += 1;
+_root.accnum += 4;
+_root.gun.crosshair._xscale += 40;
+_root.gun.crosshair._yscale += 40;
+_root.gun.crosshair._alpha -= 20;
+_root.gun.gunsel._x += random(4);
+_root.gun.gunsel._y -= random(6);
+_root.gun.gunsel.flasher.gotoAndPlay(2);

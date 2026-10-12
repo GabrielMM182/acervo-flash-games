@@ -1,0 +1,1 @@
+gotoAndStop("handgun_fire");

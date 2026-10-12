@@ -1,0 +1,17 @@
+title = "";
+firstname = "";
+surname = "";
+address1 = "";
+address2 = "";
+town = "";
+postcode = "";
+email = "";
+age = "";
+dob = "dd/mm/yyyy";
+owndvd = "";
+ownpc = "";
+ownps2 = "";
+ownxbox = "";
+cinema = "";
+optin = "1";
+stop();

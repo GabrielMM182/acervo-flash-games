@@ -1,0 +1,18 @@
+onClipEvent(enterFrame){
+   if(this.hitTest(_root.gun.accuracy.shotter1.shothit))
+   {
+      _root.bg.dustuphit1();
+   }
+   if(this.hitTest(_root.gun.accuracy.shotter2.shothit))
+   {
+      _root.bg.dustuphit2();
+   }
+   if(this.hitTest(_root.gun.accuracy.shotter3.shothit))
+   {
+      _root.bg.dustuphit3();
+   }
+   if(this.hitTest(_root.gun.accuracy.shotter4.shothit))
+   {
+      _root.bg.dustuphit4();
+   }
+}

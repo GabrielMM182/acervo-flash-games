@@ -1,0 +1,3 @@
+on(keyPress "<Left>"){
+   prevFrame();
+}

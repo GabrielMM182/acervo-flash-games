@@ -1,0 +1,10 @@
+_root.hud.magsimg._visible = false;
+_root.hud.smagsimg._visible = true;
+_root.hud.shellsimg._visible = false;
+_root.ammotyper = ".45 ACP";
+_root.damage = 50;
+_root.automatic = false;
+_root.secondary = "usp";
+_root.magcap = 12;
+_root.mag = _root.magstore2;
+_root.gunspeed = 2.5;

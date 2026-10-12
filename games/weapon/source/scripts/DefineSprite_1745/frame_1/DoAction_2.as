@@ -1,0 +1,9 @@
+_root.gun.gunsel.silencer.gotoAndPlay(42);
+_root.gun.gunsel.arm.gotoAndPlay(42);
+_root.gun.gunsel.barrel.gotoAndPlay(42);
+_root.gun.gunsel.scopes.gotoAndPlay(42);
+_root.gun.gunsel.sling.gotoAndPlay(42);
+_root.gun.gunsel.stock.gotoAndPlay(42);
+_root.gun.gunsel.rail.gotoAndPlay(42);
+_root.gun.gunsel.grip.gotoAndPlay(42);
+_root.gun.gunsel.lam.gotoAndPlay(42);

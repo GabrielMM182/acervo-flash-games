@@ -1,0 +1,3 @@
+on(keyPress "<Right>"){
+   nextFrame();
+}
