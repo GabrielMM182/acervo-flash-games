@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://unpkg.com; connect-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://infinity.unstable.life; media-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://unpkg.com; connect-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://infinity.unstable.life; media-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Local Flash Player</title>
   <style>
@@ -217,6 +217,11 @@
       width: 100%;
       height: 100%;
     }
+    #stage-game iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
     
     /* Footer */
     footer {
@@ -280,6 +285,7 @@
     const GAMES = {
       "re-apocalypse": {
         title: "Resident Evil: Apocalypse",
+        type: "flash",
         developer: "HypeGames",
         year: "2004",
         genre: "Top-Down Shooter",
@@ -293,6 +299,7 @@
       },
       weapon: {
         title: "Weapon",
+        type: "flash",
         developer: "Simon Hason / Armor Games",
         year: "2009",
         genre: "Defense / Strategy",
@@ -308,6 +315,7 @@
       },
       "last-stand": {
         title: "The Last Stand",
+        type: "flash",
         developer: "Con Artists / Armor Games",
         year: "2007",
         genre: "Survival / Defense",
@@ -320,6 +328,7 @@
       },
       "last-stand-2": {
         title: "The Last Stand 2",
+        type: "flash",
         developer: "Con Artists / Armor Games",
         year: "2008",
         genre: "Survival / Defense",
@@ -334,6 +343,7 @@
       },
       "the-waitress": {
         title: "The Waitress",
+        type: "flash",
         developer: "D-Man",
         year: "2007",
         genre: "Time Management",
@@ -346,6 +356,11 @@
       },
       "woman-on-top": {
         title: "Woman on Top",
+        type: "flash",
+        developer: "GAMES2WIN.com",
+        year: "2018",
+        genre: "Platformer / Endless Jumper",
+        flashpointId: "8df46c8f-89a1-437c-9eb4-c92010b9a1ed",
         width: 800,
         height: 600,
         variants: {
@@ -354,6 +369,11 @@
       },
       "cafe-waitress": {
         title: "Cafe Waitress",
+        type: "flash",
+        developer: "games2girls.com",
+        year: "2007",
+        genre: "Simulation / Restaurant",
+        flashpointId: "e40e43f4-d137-44ce-a71b-55af2e6b8e97",
         width: 760,
         height: 470,
         variants: {
@@ -362,10 +382,80 @@
       },
       "sushi-go-round": {
         title: "Sushi Go Round",
+        type: "flash",
+        developer: "Miniclip",
+        year: "2007",
+        genre: "Simulation / Cooking",
+        flashpointId: "75c29c44-b1ed-4095-f8de-d2b1f6e03e65",
         width: 640,
         height: 480,
         variants: {
           original: "games/sushi-go-round/sushi-go-round.swf",
+        },
+      },
+      "red-ball-3": {
+        title: "Red Ball 3",
+        type: "flash",
+        developer: "Evgeniy Fedoseev / Not Doppler",
+        year: "2011",
+        genre: "Platformer / Physics",
+        flashpointId: "08b3587a-9e10-4674-a17d-96e74123d1ba",
+        width: 630,
+        height: 420,
+        variants: {
+          original: "games/red-ball-3/red-ball-3.swf",
+        },
+      },
+      "fireboy-watergirl-forest": {
+        title: "Fireboy & Watergirl: Forest Temple",
+        type: "html5",
+        developer: "Oslo Albet",
+        year: "2018",
+        genre: "Platformer / Puzzle",
+        flashpointId: "69d74f27-05b0-402b-be27-80a672431c68",
+        width: 800,
+        height: 600,
+        variants: {
+          original: "games/fireboy-watergirl-forest/index.html",
+        },
+      },
+      "papa-louie": {
+        title: "Papa Louie: When Pizzas Attack!",
+        type: "flash",
+        developer: "Flipline Studios",
+        year: "2006",
+        genre: "Platformer / Action",
+        flashpointId: "62e21497-738d-0335-19b4-9df881f77fe1",
+        width: 550,
+        height: 400,
+        variants: {
+          original: "games/papa-louie/papa-louie.swf",
+        },
+      },
+      "papa-louie-2": {
+        title: "Papa Louie 2: When Burgers Attack!",
+        type: "flash",
+        developer: "Flipline Studios",
+        year: "2013",
+        genre: "Platformer / Action",
+        flashpointId: "16c27895-f7a6-6c65-18f3-feebcf87d28a",
+        width: 700,
+        height: 416,
+        variants: {
+          original: "games/papa-louie-2/papa-louie-2.swf",
+        },
+      },
+      "papa-louie-3": {
+        title: "Papa Louie 3: When Sundaes Attack!",
+        type: "flash",
+        developer: "Flipline Studios",
+        year: "2015",
+        genre: "Platformer / Action",
+        flashpointId: "ab638461-9317-bbaa-9ccf-e7f0360e3b1b",
+        width: 700,
+        height: 416,
+        variants: {
+          original: "games/papa-louie-3/papa-louie-3.swf",
         },
       },
     };
@@ -441,22 +531,42 @@
         return;
       }
       
-      const defaultSwf = Object.values(game.variants)[0];
+      const defaultVariant = Object.values(game.variants)[0];
       const variantName = params.get("variant") || Object.keys(game.variants)[0];
-      const swfUrl = game.variants[variantName] ?? defaultSwf;
+      const gameUrl = game.variants[variantName] ?? defaultVariant;
       
       const stage = document.getElementById("stage");
       const stageGame = document.getElementById("stage-game");
       const stageInfo = document.getElementById("stage-info");
       
-      stageGame.style.maxWidth = `${game.width}px`;
-      stageGame.style.aspectRatio = `${game.width} / ${game.height}`;
+      const gameType = game.type || "flash"; // Default to flash for backward compatibility
       
-      stageInfo.textContent = `${game.title} • ${variantName} • ${game.width}×${game.height} • Network isolated`;
+      // HTML5 games are responsive, Flash games need fixed aspect ratio
+      if (gameType === "html5") {
+        stageGame.style.maxWidth = "100%";
+        stageGame.style.width = "100%";
+        stageGame.style.height = "100%";
+        stageGame.style.margin = "0";
+      } else {
+        stageGame.style.maxWidth = `${game.width}px`;
+        stageGame.style.aspectRatio = `${game.width} / ${game.height}`;
+        stageGame.style.margin = "0 auto";
+      }
       
-      const player = window.RufflePlayer.newest().createPlayer();
-      stageGame.appendChild(player);
-      player.ruffle().load({ url: swfUrl });
+      stageInfo.textContent = `${game.title} • ${variantName} • ${game.width}×${game.height} • ${gameType === "html5" ? "HTML5" : "Ruffle"} • Network isolated`;
+      
+      if (gameType === "html5") {
+        // HTML5 game - load in iframe
+        const iframe = document.createElement("iframe");
+        iframe.src = gameUrl;
+        iframe.setAttribute("allowfullscreen", "true");
+        stageGame.appendChild(iframe);
+      } else {
+        // Flash game - load with Ruffle
+        const player = window.RufflePlayer.newest().createPlayer();
+        stageGame.appendChild(player);
+        player.ruffle().load({ url: gameUrl });
+      }
       
       stage.hidden = false;
       document.getElementById("library-header").hidden = true;

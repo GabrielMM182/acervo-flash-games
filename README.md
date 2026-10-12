@@ -1,6 +1,6 @@
 # flash-local
 
-Personal archive of old Flash games, played locally through Ruffle, with optional cheat variants produced by byte-level patches. Everything here is for personal use only; do not redistribute the SWF files.
+Personal archive of old Flash and HTML5 games, played locally through Ruffle (for Flash) or native browser (for HTML5), with optional cheat variants for Flash games produced by byte-level patches. Everything here is for personal use only; do not redistribute the game files.
 
 This file is the starting context for any future session: it explains how the archive is organized, how a new game is added, and how cheats were built, so the work can be reproduced without the original conversation.
 
@@ -289,6 +289,10 @@ Stack reasoning for `Subtract -> Pop`: before it the stack holds `[object, "name
 | Woman on Top (GAMES2WIN.com, via gry.pl) | `8df46c8f-89a1-437c-9eb4-c92010b9a1ed` | v8, AS2, 550 KB | 800x600 @ 45 fps | `original` |
 | Cafe Waitress (games2girls.com, via keygames.com) | `e40e43f4-d137-44ce-a71b-55af2e6b8e97` | v7, AS2, 1.0 MB | 760x470 @ 12 fps | `original` |
 | Sushi Go Round (Miniclip, 2007) | `75c29c44-b1ed-4095-f8de-d2b1f6e03e65` | v8, AS2, 362 KB | 640x480 @ 12 fps | `original` |
+| Red Ball 3 (Evgeniy Fedoseev / Not Doppler, 2011) | `08b3587a-9e10-4674-a17d-96e74123d1ba` | v10, AS3, 10 MB | 630x420 @ 30 fps | `original` |
+| Fireboy & Watergirl: Forest Temple (Oslo Albet, 2018) | `69d74f27-05b0-402b-be27-80a672431c68` | HTML5, 9 MB | 800x600 | `original` |
+| Papa Louie: When Pizzas Attack! (Flipline Studios, 2006) | `62e21497-738d-0335-19b4-9df881f77fe1` | v9, AS2, 2.5 MB | 550x400 @ 24 fps | `original` |
+| Papa Louie 2: When Burgers Attack! (Flipline Studios, 2013) | `16c27895-f7a6-6c65-18f3-feebcf87d28a` | v10, AS3, 9 MB | 700x416 @ 30 fps | `original` |
 | The Last Stand (Con Artists / Armor Games, 2007) | `26174ca1-7ad9-4daf-a9a3-34bf48e77f27` | v8, AS2, 4.5 MB | 800x420 @ 35 fps | `original` |
 | The Last Stand 2 (Con Artists / Armor Games, 2008) | `b37ed848-c774-4cd0-8ed4-a374b31da4a0` | v8, AS2, 8.8 MB | 800x420 @ 35 fps | `barricade-god` (default), `unlocked`, `original` |
 
@@ -302,6 +306,10 @@ Data pack SHA-256 at download time:
 - Woman on Top zip `0426f317adab00a745fa84480387eaf51f4a587100ac2b5b315101e54881aa22`
 - Cafe Waitress zip `fef42820e630b2e3864a5a61a223f501b2f7a9ee9fddf17d81c286bfb098cf8c`
 - Sushi Go Round zip `170afe478a4aae6a22a22b80c19a2ab9b352ed1a0a8a5c7336488bf49c673df4`
+- Red Ball 3 zip `aca9da3f3df2a8e21594c8b12ad2236455fcada5708346c0eecd757c8207e806`
+- Fireboy & Watergirl Forest Temple zip `4127d52d1779de88667203a258eb4497b0ec3fe74e06fcd9ad60b9df26e1b5a5`
+- Papa Louie zip `c253b67ecd1572308ce291dcceb6012bb51fb77ad2f3ea1696023590d2c1b4b7`
+- Papa Louie 2 zip `ead8016c8e32c035f3975c12549d4ed52a21f430cff7790800a13f7195b89790`
 - FFDec `ffdec_26.3.0.zip` `35f4930eb7c380afe66f2117f90b006deac0631473ad7500bb39c78f68645ecd`
 
 ### Resident Evil: Apocalypse
@@ -373,6 +381,45 @@ Data pack SHA-256 at download time:
 - SWF has `Protect` tag (anti-decompilation protection, common in Miniclip games).
 - Runs unmodified. No cheats yet.
 - Note: Java is not installed on this system, so ActionScript source export with FFDec was skipped. Install Java 8+ to enable source export for future cheat development.
+
+### Red Ball 3
+
+- Source file in the pack: `content/i.notdoppler.com/files/redball3.swf` (Not Doppler original). The pack also contains an A10.com version (`redball3_a10.swf`) and a funo.com version titled "Red Ball Hero" (`redballhero.swf`), not used.
+- **First AS3 game in the archive** (v10, AVM2). Previous games are AS1/AS2 (AVM1). AS3 cheats would require ABC bytecode analysis instead of AVM1 tools.
+- Platformer with Box2D physics: roll and jump through levels to save your kidnapped girlfriend. Frame labels include `Preloader`, `Embeding`, `StartComics`, `SelectLevel`, `Game`, `EndComics`, `Intro`.
+- Network calls: CPMStar ads via `loadMovie` (blocked by CSP), MochiBot tracking to `mochibot.com` (blocked), Playtomic analytics to `playtomic.com` (blocked), Kongregate API, Not Doppler high scores and links via `navigateToURL`/`URLRequest`/`URLLoader` (AS3 networking, blocked by CSP). `SharedObject` for local saves.
+- SWF has `Protect` tag.
+- Runs unmodified. No cheats yet (AS3 patching not implemented).
+- Note: Java is not installed on this system, so ActionScript source export with FFDec was skipped. Install Java 8+ to enable source export for future analysis.
+
+### Fireboy & Watergirl: Forest Temple
+
+- **First HTML5 game in the archive.** HTML5 games run natively in the browser without Ruffle.
+- Source directory in the pack: `content/html5.gamedistribution.com/rvvASMiM/a55c9cc9c21e4fc683c8c6857f3d0c75/` (GameDistribution original via Agame).
+- Cooperative platformer/puzzle game: control Fireboy (red, can't touch water) and Watergirl (blue, can't touch fire) simultaneously or with a friend. Navigate through the Forest Temple collecting diamonds and reaching the exits. 40 levels.
+- Structure: JavaScript-based game using RequireJS module loader, Phaser-like game engine. Assets include sprite atlasses (JSON + PNG), audio (MP3), and level data.
+- Network calls: The original game attempted to load GameDistribution SDK and ads, but the CSP blocks external connections. The game runs entirely from local files.
+- No cheats or modifications applied. HTML5 games can be modified by editing JavaScript source files, but that approach was not taken here.
+- Runs in an iframe within the player interface.
+
+### Papa Louie: When Pizzas Attack!
+
+- Source file in the pack: `content/i.flipline.com/gamefiles/papalouie/papalouie_v2.swf` (Flipline Studios original, v2). The pack also contains Kongregate, Miniclip, and hackedarcadegames versions, not used.
+- Platformer/action game: Papa Louie's pizzas were transformed into Pizza Monsters that kidnapped his customers. Armed with a pizza paddle and Pepper Bombs, rescue all customers and defeat the Infamous Onion Ring boss. Navigate through 7 themed worlds (Wheat Fields, Dough Mines, Tomato Sauce Factory, Melted Cheese, etc.) with multiple levels each.
+- Network calls: MochiAds via `loadMovie` (blocked by CSP), Flipline high scores via `LoadVars`/`sendAndLoad` to papalouie.net (blocked by CSP), links to Flipline website, iTunes, Google Play, Amazon. `SharedObject` for local saves (3 save slots).
+- Complex game with extensive sound system (86 sound exports, layered music tracks per world), multiple enemy types (45+ enemy sprite exports), items, power-ups, boss battles, and training mode.
+- Runs unmodified. No cheats yet.
+- Note: Java is not installed on this system, so ActionScript source export with FFDec was skipped. Install Java 8+ to enable source export for future cheat development.
+
+### Papa Louie 2: When Burgers Attack!
+
+- Source file in the pack: `content/i.flipline.com/gamefiles/papalouie2/PapaLouie2_v2_1.swf` (Flipline Studios official, v2.1, latest version). The pack also contains v1.0, v2.0, games68.com, and samshackedgames versions, not used.
+- **Second AS3 game in the archive** (v10, AVM2). Much larger and more complex than the first Papa Louie.
+- Platformer/action sequel: Radley Madish, Sarge, and Burgerzillas kidnap Papa Louie and customers through a portal. Play as Marty and Rita to rescue customers in the Land of Munchmore. Each rescued customer becomes a playable character with unique weapons and special abilities (pound, crawl, double jump, glide, push, wall jump). Use abilities to reach new areas, rescue more customers, and earn Warp Keys.
+- Network calls: MochiAds, Kongregate API, Armor Games API, Playtomic analytics (all blocked by CSP), Flipline promos and high scores, links to iTunes, Google Play, Amazon, Facebook, Twitter. `SharedObject` for local saves.
+- Massive game: 1821 sprites, 120 sounds, multiple playable characters with different movesets, achievements system, level progression with unlocks.
+- Runs unmodified. No cheats yet (AS3 patching not implemented).
+- Note: Java is not installed on this system, so ActionScript source export with FFDec was skipped. Install Java 8+ to enable source export for future analysis.
 
 ### Removed / not working
 
