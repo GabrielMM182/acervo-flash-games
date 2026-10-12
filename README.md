@@ -209,6 +209,9 @@ Stack reasoning for `Subtract -> Pop`: before it the stack holds `[object, "name
 | Resident Evil: Apocalypse (2004 promotional game, HypeGames) | `638dff57-94a2-477d-a454-d50895a07a18` | v6, AS1, 605 KB | 700x570 @ 30 fps | `original`, `godmode` |
 | Weapon (Simon Hason / Armor Games, 2009) | `252cc09b-2701-49f0-ab8e-9210c1995c93` | v9 header but AS2, 3.8 MB | 760x380 @ 28 fps | `original`, `heli`, `money`, `all` |
 | The Waitress (D-Man / GamingDelight, 2007) | `19e16dc4-af08-46b5-a06f-b6f875fedab6` | v6, AS1, 973 KB | 620x340 @ 12 fps | `original` |
+| Woman on Top (GAMES2WIN.com, via gry.pl) | `8df46c8f-89a1-437c-9eb4-c92010b9a1ed` | v8, AS2, 550 KB | 800x600 @ 45 fps | `original` |
+| Cafe Waitress (games2girls.com, via keygames.com) | `e40e43f4-d137-44ce-a71b-55af2e6b8e97` | v7, AS2, 1.0 MB | 760x470 @ 12 fps | `original` |
+| Sushi Go Round (Miniclip, 2007) | `75c29c44-b1ed-4095-f8de-d2b1f6e03e65` | v8, AS2, 362 KB | 640x480 @ 12 fps | `original` |
 | The Last Stand (Con Artists / Armor Games, 2007) | `26174ca1-7ad9-4daf-a9a3-34bf48e77f27` | v8, AS2, 4.5 MB | 800x420 @ 35 fps | `original` |
 | The Last Stand 2 (Con Artists / Armor Games, 2008) | `b37ed848-c774-4cd0-8ed4-a374b31da4a0` | v8, AS2, 8.8 MB | 800x420 @ 35 fps | `barricade-god` (default), `unlocked`, `original` |
 
@@ -219,6 +222,9 @@ Data pack SHA-256 at download time:
 - The Last Stand zip `5f774611459c9620bd6f0c750509d886322df0d870f22f1578f1c146d1069f00`
 - The Last Stand 2 zip `fd1ee38dbef0194dd2827e1943d5814c781d19b9600d1d8bda4b38abbb32cb03`
 - The Waitress swf (Internet Archive) `c84ea775608b11c88c4217ea83eab03def5d240be22a8c58a4278c851c7c2af6`
+- Woman on Top zip `0426f317adab00a745fa84480387eaf51f4a587100ac2b5b315101e54881aa22`
+- Cafe Waitress zip `fef42820e630b2e3864a5a61a223f501b2f7a9ee9fddf17d81c286bfb098cf8c`
+- Sushi Go Round zip `170afe478a4aae6a22a22b80c19a2ab9b352ed1a0a8a5c7336488bf49c673df4`
 - FFDec `ffdec_26.3.0.zip` `35f4930eb7c380afe66f2117f90b006deac0631473ad7500bb39c78f68645ecd`
 
 ### Resident Evil: Apocalypse
@@ -265,6 +271,31 @@ Data pack SHA-256 at download time:
 - Time management game: take orders, serve food/drinks, clean tables. Four frame labels: `MainMenu`, `Init`, `Game`, `GameOver`.
 - Network calls: attempts to load MochiAds and send high scores to `sugar-free-games.com` (both blocked by CSP). The ad preloader likely skips quickly under Ruffle since the `loadMovie` target is unreachable.
 - Runs unmodified. No cheats yet.
+
+### Woman on Top
+
+- Source file in the pack: `content/www8.agame.com/mirror/flash/w/woman_on_top_gamesgames_com.swf` (games2win.com via agame.com).
+- Endless jumper/platformer: jump between platforms, climb upwards. Frame labels include `ph1`, `ph2` (preloader phases), `zedo`, `mochi` (ad providers), `lblgameintro`, `story`, `instructions`, `select`, `lblgame`, `win`, `gameOver`, `levelComplete`, `highScores`.
+- Network calls: attempts to load MochiAds and Zedo ads via `loadMovie` (blocked by CSP), high score submission via `LoadVars` and `sendAndLoad` to games2win.com servers (blocked by CSP).
+- Runs unmodified. No cheats yet.
+- Note: Java is not installed on this system, so ActionScript source export with FFDec was skipped. Install Java 8+ to enable source export for future cheat development.
+
+### Cafe Waitress
+
+- Source file in the pack: `content/assets.casualportals.com/games/4/62864/62864.swf` (games2girls.com via casualportals).
+- Restaurant simulation: serve customers in a cafe. Take orders, get food from kitchen (pizza, hamburger, hotdog, fish), prepare drinks (cola, orange, lime, coffee), serve customers, clean tables, recycle dishes. Frame labels show extensive customer animations (walking, sitting, eating, drinking, leaving) and worker states.
+- Network calls: only a single `_blank` link to games2girls.com (publisher). No ads, no high scores, no LoadVars - this is the cleanest game in the archive.
+- Runs unmodified. No cheats yet.
+- Note: Java is not installed on this system, so ActionScript source export with FFDec was skipped. Install Java 8+ to enable source export for future cheat development.
+
+### Sushi Go Round
+
+- Source file in the pack: `content/www.miniclip.com/games/sushi-go-round/en/sushigoround.swf` (Miniclip original, v1.6).
+- Restaurant simulation: you are a replacement chef with a 1-week trial. Follow recipes to prepare sushi and serve customers. Frame labels include `loadAd`, `showAd`, `preload`, `start`, `viewscore`, `getCode`, `prep` (preparation), `tu` (tutorial), `game`, `winz`, `loz` (lose), `savescore`, `tryagain`, `credit`.
+- Network calls: attempts to load Miniclip ads via `loadMovie` to `ads.miniclip.com` (blocked by CSP), high score system via `LoadVars` to `miniclip.com/swfcontent/highscore.swf` (blocked by CSP), links to miniclip.com and App Store.
+- SWF has `Protect` tag (anti-decompilation protection, common in Miniclip games).
+- Runs unmodified. No cheats yet.
+- Note: Java is not installed on this system, so ActionScript source export with FFDec was skipped. Install Java 8+ to enable source export for future cheat development.
 
 ### Removed / not working
 
